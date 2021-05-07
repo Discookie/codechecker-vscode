@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:codechecker-vscode.helloWorld"
+		"onStartupFinished"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
@@ -19,7 +19,32 @@
 				"command": "codechecker-vscode.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "codechecker",
+					"title": "CodeChecker",
+					"icon": "media/codechecker_logo.png"
+				}
+			]
+		},
+		"views": {
+			"codechecker": [
+				{
+					"id": "codechecker.views.overview",
+					"name": "Overview",
+					"icon": "media/codechecker_logo.png",
+					"contextualTitle": "CodeChecker"
+				},
+				{
+					"id": "codechecker.views.quickMenu",
+					"name": "Quick Menu",
+					"icon": "media/codechecker_logo.png",
+					"contextualTitle": "CodeChecker"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run package",

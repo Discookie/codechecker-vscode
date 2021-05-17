@@ -128,7 +128,7 @@ export class DiagnosticsApi implements Disposable {
         }
 
         // Remove files that are no longer referenced
-        for (const plistFile in this._diagnosticEntries) {
+        for (const plistFile of this._diagnosticEntries.keys()) {
             if (!loadedPlistFiles.has(plistFile)) {
                 this._diagnosticEntries.delete(plistFile);
             }
@@ -179,18 +179,8 @@ export class DiagnosticsApi implements Disposable {
         return this._diagnosticsUpdated.event;
     }
 
-    onFileOpened(uri: Uri): void {
-        this._openedFiles.push(uri.path);
-
-        this.reloadDiagnostics()
-            .catch((err) => {
-                console.error(err);
-                window.showErrorMessage('Unexpected error when reloading diagnostics \nCheck console for more details');
-            });
-    }
-
-    onFileClosed(uri: Uri): void {
-        this._openedFiles = this._openedFiles.filter(val => val !== uri.path);
+    onOpenFilesChanged(uris: Uri[]): void {
+        this._openedFiles = uris.map(uri => uri.path);
 
         this.reloadDiagnostics()
             .catch((err) => {

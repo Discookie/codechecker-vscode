@@ -1,4 +1,4 @@
-import { Diagnostic, DiagnosticCollection, DiagnosticRelatedInformation, DiagnosticSeverity, ExtensionContext, languages, Location, Position, Range, TextDocument, TextDocumentChangeEvent, Uri, workspace } from 'vscode';
+import { Diagnostic, DiagnosticCollection, DiagnosticRelatedInformation, DiagnosticSeverity, ExtensionContext, languages, Location, Position, Range, TextDocument, TextDocumentChangeEvent, TextEditor, Uri, window, workspace } from 'vscode';
 import { getVSCodeDownloadUrl } from 'vscode-test/out/util';
 import { AnalysisPathEvent, AnalysisPathKind, DiagnosticEntry } from '../backend/types';
 import { ExtensionApi as api } from '../backend/api';
@@ -7,14 +7,14 @@ import { ExtensionApi as api } from '../backend/api';
 
 export class DiagnosticRenderer {
     private _diagnosticCollection: DiagnosticCollection;
+    private _lastOpenedFiles: Uri[] = [];
     private _openedFiles: Uri[] = [];
 
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._diagnosticCollection = languages.createDiagnosticCollection('codechecker'));
 
-        workspace.onDidOpenTextDocument(this.onDocumentOpened, this, ctx.subscriptions);
+        window.onDidChangeVisibleTextEditors(this.onDocumentsChanged, this, ctx.subscriptions);
         workspace.onDidChangeTextDocument(this.onDocumentChanged, this, ctx.subscriptions);
-        workspace.onDidCloseTextDocument(this.onDocumentClosed, this, ctx.subscriptions);
         api.diagnostics.diagnosticsUpdated(this.onDiagnosticUpdated, this, ctx.subscriptions);
     }
 
@@ -22,14 +22,13 @@ export class DiagnosticRenderer {
         this.updateAllDiagnostics();
     }
 
-    onDocumentOpened(event: TextDocument) {
-        api.diagnostics.onFileOpened(event.uri);
-        this._openedFiles.push(event.uri);
-    }
+    onDocumentsChanged(event: TextEditor[]) {
+        const uriList = event.map(editor => editor.document.uri);
 
-    onDocumentClosed(event: TextDocument) {
-        this._openedFiles = this._openedFiles.filter(uri => uri.toString() !== event.uri.toString());
-        api.diagnostics.onFileClosed(event.uri);
+        this._lastOpenedFiles = this._openedFiles;
+        this._openedFiles = uriList;
+
+        api.diagnostics.onOpenFilesChanged(uriList);
     }
 
     onDocumentChanged(event: TextDocumentChangeEvent) {
@@ -41,11 +40,21 @@ export class DiagnosticRenderer {
         for (const uri of this._openedFiles) {
             this.updateDiagnostics(uri);
         }
+
+        for (const uri of this._lastOpenedFiles) {
+            if (this._openedFiles.some(openedUri => openedUri.toString() === uri.toString())) {
+                continue;
+            }
+
+            this.updateDiagnostics(uri);
+        }
     }
 
     // TODO: Implement CancellableToken
     updateDiagnostics(uri: Uri): void {
         if (!api.diagnostics.dataExistsForFile(uri)) {
+            // Push an empty diagnostics set
+            this._diagnosticCollection.set(uri, []);
             return;
         }
 

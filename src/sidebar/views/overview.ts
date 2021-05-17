@@ -1,9 +1,10 @@
 import { Command, ExtensionContext, TreeDataProvider, TreeItem, TreeView, window } from 'vscode';
+import { CommandItem } from './items';
 
 export class OverviewView implements TreeDataProvider<string> {
     protected tree?: TreeView<string>;
     protected itemsList: string[];
-    protected items: {[id: string]: () => string};
+    protected items: {[id: string]: (() => string) | CommandItem};
 
     constructor() {
         // TODO: Export this into a better descriptor object
@@ -12,6 +13,14 @@ export class OverviewView implements TreeDataProvider<string> {
             'warnings': () => 'Number of warnings: 50',
             'lastRun': () => 'Last run on: 2021. 05. 03. 11:23',
             'separator': () => '---',
+            'rebuildFile': new CommandItem('Rebuild current file', {
+                title: 'rebuildCurrentFile', 
+                command: 'codechecker-vscode.build.rebuildCurrentFile'
+            }),
+            'toggleErrors': new CommandItem('Toggle displaying errors in code', {
+                title: 'toggleErrors', 
+                command: 'codechecker-vscode.diagnostics.toggleErrors'
+            }),
         };
 
         this.itemsList = [
@@ -19,6 +28,8 @@ export class OverviewView implements TreeDataProvider<string> {
             'warnings',
             'lastRun',
             'separator',
+            'rebuildFile',
+            'toggleErrors',
         ];
 
         this.init();
@@ -42,8 +53,10 @@ export class OverviewView implements TreeDataProvider<string> {
     }
 
     getTreeItem(item: string): TreeItem | Promise<TreeItem> {
-        let labelFunc = this.items[item];
-        let node = new TreeItem(labelFunc());
+        let displayedItem = this.items[item];
+        let node = displayedItem instanceof CommandItem
+            ? displayedItem.getTreeItem()
+            : new TreeItem(displayedItem());
         
         return node;
     }

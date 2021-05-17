@@ -76,12 +76,6 @@
           "name": "Overview",
           "icon": "media/codechecker_logo.png",
           "contextualTitle": "CodeChecker"
-        },
-        {
-          "id": "codechecker.views.quickMenu",
-          "name": "Quick Menu",
-          "icon": "media/codechecker_logo.png",
-          "contextualTitle": "CodeChecker"
         }
       ]
     }

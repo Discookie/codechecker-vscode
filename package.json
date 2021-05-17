@@ -20,6 +20,46 @@
         "title": "Hello World"
       }
     ],
+    "configuration": {
+      "title": "CodeChecker",
+      "properties": {
+        "codechecker.runner.executablePath": {
+          "type": "string",
+          "description": "Path to the CodeChecker executable",
+          "default": "CodeChecker"
+        },
+        "codechecker.runner.executableArgs": {
+          "type": ["string", "null"],
+          "description": "Additional arguments to the CodeChecker executable",
+          "default": null
+        },
+        "codechecker.runner.outputFolder": {
+          "type": "string",
+          "description": "Output for CodeChecker's analysis files",
+          "default": "${workspaceFolder}/codechecker"
+        },
+        "codechecker.editor.showBugs": {
+          "type": "boolean",
+          "description": "Toggles showing bugs inside the editor.",
+          "default": "true"
+        },
+        "codechecker.editor.showReproductionPath": {
+          "type": "boolean",
+          "description": "Toggles showing the full reproduction path inside the editor.",
+          "default": "false"
+        },
+        "codechecker.sidebar.showQuickMenu": {
+          "type": "boolean",
+          "description": "Toggles the quick menu action buttons on or off. Does not affect the statistics shown there.",
+          "default": "true"
+        },
+        "codechecker.sidebar.defaultSort": {
+          "type": "string",
+          "description": "Sets the default sort for the 'All files' section.",
+          "default": "true"
+        }
+      }
+    },
     "viewsContainers": {
       "activitybar": [
         {

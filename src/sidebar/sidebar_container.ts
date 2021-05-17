@@ -1,5 +1,5 @@
-import { ExtensionContext } from "vscode";
-import { OverviewView, QuickMenuView } from "./views";
+import { ExtensionContext } from 'vscode';
+import { OverviewView, QuickMenuView } from './views';
 
 export class SidebarContainer {
     static init(ctx: ExtensionContext): void {

@@ -1,5 +1,5 @@
-import { Command, commands, TreeDataProvider, TreeItem, TreeView, window } from "vscode";
-import { CommandItem } from "./items";
+import { Command, commands, TreeDataProvider, TreeItem, TreeView, window } from 'vscode';
+import { CommandItem } from './items';
 
 export class QuickMenuView implements TreeDataProvider<string> {
     protected tree?: TreeView<string>;

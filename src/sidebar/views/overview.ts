@@ -1,4 +1,4 @@
-import { Command, ExtensionContext, TreeDataProvider, TreeItem, TreeView, window } from "vscode";
+import { Command, ExtensionContext, TreeDataProvider, TreeItem, TreeView, window } from 'vscode';
 
 export class OverviewView implements TreeDataProvider<string> {
     protected tree?: TreeView<string>;

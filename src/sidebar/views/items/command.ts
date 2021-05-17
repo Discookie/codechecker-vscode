@@ -1,4 +1,4 @@
-import { Command, TreeItem } from "vscode";
+import { Command, TreeItem } from 'vscode';
 
 export class CommandItem {
     constructor(protected label: string, protected command: Command) {}

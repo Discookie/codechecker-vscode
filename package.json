@@ -114,6 +114,7 @@
     "webpack-cli": "^4.4.0"
   },
   "dependencies": {
-    "fast-plist": "^0.1.2"
+    "fast-plist": "^0.1.2",
+    "mnemonist": "^0.38.3"
   }
 }

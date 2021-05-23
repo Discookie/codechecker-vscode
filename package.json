@@ -76,6 +76,12 @@
           "name": "Overview",
           "icon": "media/codechecker_logo.png",
           "contextualTitle": "CodeChecker"
+        },
+        {
+          "id": "codechecker.views.currentFile",
+          "name": "Current File Bugs",
+          "icon": "media/codechecker_logo.png",
+          "contextualTitle": "CodeChecker"
         }
       ]
     }

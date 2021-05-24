@@ -105,8 +105,8 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
         // Second level, reproduction steps
         if (element.reprStep === undefined) {
             const commands: CurrentFileMetadata[] = [
-                { ...element, description: 'Jump to bug', command: { title: 'jumpToBug', command: 'codechecker.editor.jumpToBug' } },
-                { ...element, description: 'Toggle reproduction steps', command: { title: 'toggleSteps', command: 'codechecker.editor.toggleSteps' } },
+                { ...element, description: 'Jump to bug', command: { title: 'jumpToBug', command: 'codechecker.editor.jumpToBug', arguments: [this.currentFile, element.bugIndex, true] } },
+                { ...element, description: 'Toggle reproduction steps', command: { title: 'toggleSteps', command: 'codechecker.editor.toggleSteps', arguments: [this.currentFile, element.bugIndex] } },
                 { ...element, description: '---' }
             ];
 
@@ -133,7 +133,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
         // Command nodes
         if (element.command !== undefined) {
             const item = new TreeItem(element.description ?? element.command.title);
-            item.command = { ...element.command, arguments: [element] };
+            item.command = element.command;
         }
 
         // Description nodes, also handles special case with no bugs
@@ -167,7 +167,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
         item.command = {
             title: 'jumpToStep',
             command: 'codechecker.editor.jumpToStep',
-            arguments: [this.currentFile, element]
+            arguments: [this.currentFile, element.bugIndex, element.reprStep, true]
         };
 
         return item;

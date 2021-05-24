@@ -135,6 +135,7 @@ export class DiagnosticRenderer {
         for (const [file, diagnostics] of diagnosticMap) {
             const uri = Uri.parse(file);
             this._diagnosticCollection.set(uri, diagnostics);
+            // FIXME: Use the end-result files as _lastOpenedFiles
         }
     }
 }

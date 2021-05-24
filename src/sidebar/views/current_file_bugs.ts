@@ -92,8 +92,6 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
                 };
             });
 
-            console.log("Added bug-items:", commands.concat(items));
-
             return commands.concat(items);
         }
 

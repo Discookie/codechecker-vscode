@@ -1,7 +1,7 @@
 import { Diagnostic, DiagnosticCollection, DiagnosticRelatedInformation, DiagnosticSeverity, ExtensionContext, languages, Location, Position, Range, TextDocument, TextDocumentChangeEvent, TextEditor, Uri, window, workspace } from 'vscode';
 import { getVSCodeDownloadUrl } from 'vscode-test/out/util';
 import { AnalysisPathEvent, AnalysisPathKind, DiagnosticEntry } from '../backend/types';
-import { ExtensionApi as api } from '../backend/api';
+import { ExtensionApi as api, ExtensionApi } from '../backend/api';
 
 // TODO: implement api
 
@@ -27,8 +27,10 @@ export class DiagnosticRenderer {
 
         this._lastOpenedFiles = this._openedFiles;
         this._openedFiles = uriList;
-
-        api.diagnostics.onOpenFilesChanged(uriList);
+        
+        if (ExtensionApi.diagnostics.stickyFile !== undefined) {
+            this._openedFiles.push(ExtensionApi.diagnostics.stickyFile);
+        }
     }
 
     onDocumentChanged(event: TextDocumentChangeEvent) {
@@ -37,6 +39,7 @@ export class DiagnosticRenderer {
 
     // TODO: Implement CancellableToken
     updateAllDiagnostics(): void {
+
         for (const uri of this._openedFiles) {
             this.updateDiagnostics(uri);
         }

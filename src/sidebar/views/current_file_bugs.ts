@@ -41,11 +41,12 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
     }
 
     onEditorChange(editor?: TextEditor) {
-        this.currentFile = editor?.document.uri;
+        this.currentFile = ExtensionApi.diagnostics.stickyFile ?? editor?.document.uri;
         this.refreshBugList();
     }
 
     onDiagnosticsUpdated() {
+        this.currentFile = ExtensionApi.diagnostics.stickyFile ?? this.currentFile;
         this.refreshBugList();
     }
 

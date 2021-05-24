@@ -15,12 +15,12 @@ export class NavigationHandler {
     }
 
     jumpToBug(file: Uri | string, bugIndex: number, keepCurrentFile: boolean): void {
-        if (keepCurrentFile) {
-            // TODO:
-        }
-
         if (typeof file === 'string') {
             file = Uri.file(file);
+        }
+
+        if (keepCurrentFile) {
+            ExtensionApi.diagnostics.stickyFile = file;
         }
 
         const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
@@ -42,12 +42,12 @@ export class NavigationHandler {
     }
 
     jumpToStep(file: Uri | string, bugIndex: number, stepIndex: number, keepCurrentFile: boolean): void {
-        if (keepCurrentFile) {
-            // TODO:
-        }
-
         if (typeof file === 'string') {
             file = Uri.file(file);
+        }
+
+        if (keepCurrentFile) {
+            ExtensionApi.diagnostics.stickyFile = file;
         }
 
         const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];

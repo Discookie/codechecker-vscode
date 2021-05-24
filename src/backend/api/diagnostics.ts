@@ -1,5 +1,5 @@
 import { Trie, TrieMap } from 'mnemonist';
-import { Disposable, Event, EventEmitter, ExtensionContext, Uri, window, workspace } from 'vscode';
+import { Disposable, Event, EventEmitter, ExtensionContext, TextEditor, Uri, window, workspace } from 'vscode';
 import { DiagnosticParser, MetadataParser } from '../parser';
 import { CheckerMetadata, DiagnosticEntry, DiagnosticFile } from '../types';
 
@@ -7,7 +7,7 @@ import { CheckerMetadata, DiagnosticEntry, DiagnosticFile } from '../types';
  * API interface that provides Diagnostics data.  
  * Access the active instance via ExtensionApi.
  */
-export class DiagnosticsApi implements Disposable {
+export class DiagnosticsApi {
     private _metadata?: CheckerMetadata;
     /** 
      * Content based on the metadata file only.
@@ -23,8 +23,26 @@ export class DiagnosticsApi implements Disposable {
      */
     private _diagnosticSourceFiles: TrieMap<string, string[]> = new TrieMap();
 
+    private _stickyFile?: Uri;
+    private _ignoreNextActiveEditorChange = false;
+
+    public get stickyFile(): Uri | undefined {
+        return this._stickyFile;
+    }
+    public set stickyFile(value: Uri | undefined) {
+        this._stickyFile = value;
+
+        if (this._stickyFile?.path !== window.activeTextEditor?.document.uri.path) {
+            this._ignoreNextActiveEditorChange = true;
+        }
+
+        this.reloadDiagnostics();
+    }
+
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._diagnosticsUpdated = new EventEmitter());
+        window.onDidChangeActiveTextEditor(this.onActiveEditorChanged, this, ctx.subscriptions);
+        window.onDidChangeVisibleTextEditors(this.onDocumentsChanged, this, ctx.subscriptions);
 
         this.init(ctx);
     }
@@ -34,19 +52,10 @@ export class DiagnosticsApi implements Disposable {
             .catch((err) => {
                 console.log(err);
                 window.showErrorMessage('Unexpected error when reloading metadata \nCheck console for more details');
+            })
+            .then(_ => {
+                this.onDocumentsChanged(window.visibleTextEditors);
             });
-    }
-
-    dispose(): void {
-
-    }
-
-    registerHooks(): void {
-
-    }
-
-    unregisterHooks(): void {
-
     }
 
     async reloadMetadata(): Promise<void> {
@@ -102,7 +111,14 @@ export class DiagnosticsApi implements Disposable {
     // TODO: Add support for cancellation tokens
     async reloadDiagnostics(forceReload?: boolean): Promise<void> {
         // TODO: Allow loading all diagnostics at once
-        const plistFilesToLoad = this._openedFiles.map(file => this._metadataSourceFiles.get(file)).filter(val => val);
+        let plistFilesToLoad = this._openedFiles.map(file => this._metadataSourceFiles.get(file));
+
+        if (this._stickyFile !== undefined) {
+            plistFilesToLoad.push(this._metadataSourceFiles.get(this._stickyFile.path));
+        }
+
+        // Remove extra undefined/null values
+        plistFilesToLoad = plistFilesToLoad.filter(val => val);
 
         if (forceReload) {
             this._diagnosticEntries = new Map();
@@ -179,7 +195,17 @@ export class DiagnosticsApi implements Disposable {
         return this._diagnosticsUpdated.event;
     }
 
-    onOpenFilesChanged(uris: Uri[]): void {
+    onActiveEditorChanged(event?: TextEditor): void {
+        if (this._ignoreNextActiveEditorChange) {
+            this._ignoreNextActiveEditorChange = false;
+            return;
+        }
+
+        this.stickyFile = undefined;
+    }
+
+    onDocumentsChanged(event: TextEditor[]): void {
+        const uris = event.map(editor => editor.document.uri);
         this._openedFiles = uris.map(uri => uri.path);
 
         this.reloadDiagnostics()

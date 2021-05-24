@@ -3,7 +3,7 @@ import { DiagnosticsApi } from './diagnostics';
 
 export class ExtensionApi {
     static init(ctx: ExtensionContext): void {
-        ctx.subscriptions.push(this._diagnostics = new DiagnosticsApi(ctx));
+        this._diagnostics = new DiagnosticsApi(ctx);
     }
 
     private static _diagnostics: DiagnosticsApi;

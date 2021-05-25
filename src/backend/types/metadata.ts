@@ -16,7 +16,7 @@ export interface AnalyzerMetadata {
 
 export interface CheckerMetadata {
     readonly name: string;
-    readonly timestamp: {begin: number, end: number};
+    readonly timestamps: {begin: number, end: number};
     
     readonly command: string;
     readonly version: string;

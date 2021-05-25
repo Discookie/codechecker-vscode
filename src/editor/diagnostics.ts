@@ -142,10 +142,16 @@ export class DiagnosticRenderer {
                 const errorFile = entry.files[errorDiag.location.file];
 
                 // Render corresponding error
-                renderDiagnosticItem(entry, errorDiag, DiagnosticSeverity.Error, [
-                    makeRelatedInformation(entry, fullPath[0].location, 'first reproduction step'),
-                    makeRelatedInformation(entry, fullPath[fullPath.length - 2].location, 'last  reproduction step')
-                ]);
+                {
+                    const relatedInformation: DiagnosticRelatedInformation[] = fullPath.length > 0
+                        ? [
+                            makeRelatedInformation(entry, fullPath[0].location, 'first reproduction step'),
+                            makeRelatedInformation(entry, fullPath[fullPath.length - 2].location, 'last  reproduction step')
+                        ]
+                        : [];
+
+                    renderDiagnosticItem(entry, errorDiag, DiagnosticSeverity.Error, relatedInformation);
+                }
 
                 // Render reproduction path
                 for (const [idx, pathItem] of fullPath.entries()) {

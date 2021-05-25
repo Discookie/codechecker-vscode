@@ -97,9 +97,13 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
 
         // Second level, reproduction steps
         if (element.reprStep === undefined) {
+            const reprStepsText = this.currentBugList![element.bugIndex] !== ExtensionApi.diagnostics.activeReprPath
+                ? 'Show reproduction steps'
+                : 'Hide reproduction steps';
+
             const commands: CurrentFileMetadata[] = [
                 { ...element, description: 'Jump to bug', command: { title: 'jumpToBug', command: 'codechecker.editor.jumpToBug', arguments: [this.currentFile, element.bugIndex, true] } },
-                { ...element, description: 'Toggle reproduction steps', command: { title: 'toggleSteps', command: 'codechecker.editor.toggleSteps', arguments: [this.currentFile, element.bugIndex] } },
+                { ...element, description: reprStepsText, command: { title: 'toggleSteps', command: 'codechecker.editor.toggleSteps', arguments: [this.currentFile, element.bugIndex] } },
                 { ...element, description: '---' }
             ];
 

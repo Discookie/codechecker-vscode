@@ -10,8 +10,20 @@ export class NavigationHandler {
         ctx.subscriptions.push(commands.registerCommand('codechecker.editor.jumpToStep', this.jumpToStep, this));
     }
 
-    toggleSteps(file: Uri | string, bugIndex: number, state?: boolean): void {
-        // TODO:
+    toggleSteps(file: Uri | string, bugIndex: number, targetState?: boolean): void {
+        if (typeof file === 'string') {
+            file = Uri.file(file);
+        }
+
+        const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
+
+        targetState = targetState ?? ((diagnostic ?? []) !== ExtensionApi.diagnostics.activeReprPath);
+
+        if (targetState) {
+            ExtensionApi.diagnostics.setActiveReprPath(file, bugIndex);
+        } else {
+            ExtensionApi.diagnostics.clearActiveReprPath();
+        }
     }
 
     jumpToBug(file: Uri | string, bugIndex: number, keepCurrentFile: boolean): void {

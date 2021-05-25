@@ -39,6 +39,26 @@ export class DiagnosticsApi {
         this.reloadDiagnostics();
     }
 
+    private _activeReprPath?: DiagnosticEntry;
+    public get activeReprPath(): DiagnosticEntry | undefined {
+        return this._activeReprPath;
+    }
+    
+    public setActiveReprPath(filename: Uri, idx: number) {
+        const diags = this.getFileDiagnostics(filename);
+        if ((diags ?? [])[idx] !== undefined) {
+            this._activeReprPath = diags[idx];
+            this._diagnosticsUpdated.fire();
+        }
+    }
+
+    public clearActiveReprPath() {
+        if (this._activeReprPath !== undefined) {
+            this._activeReprPath = undefined;
+            this._diagnosticsUpdated.fire();
+        }
+    }
+
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._diagnosticsUpdated = new EventEmitter());
         window.onDidChangeActiveTextEditor(this.onActiveEditorChanged, this, ctx.subscriptions);

@@ -17,9 +17,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
 
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._onDidChangeTreeData = new EventEmitter());
-        window.onDidChangeActiveTextEditor(this.onEditorChange, this, ctx.subscriptions);
         ExtensionApi.diagnostics.diagnosticsUpdated(this.onDiagnosticsUpdated, this, ctx.subscriptions);
-
 
         this.init();
     }
@@ -40,11 +38,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
         return this._onDidChangeTreeData.event;
     }
 
-    onEditorChange(editor?: TextEditor) {
-        this.currentFile = ExtensionApi.diagnostics.stickyFile ?? editor?.document.uri;
-        this.refreshBugList();
-    }
-
+    // An editor change always triggers this change as well.
     onDiagnosticsUpdated() {
         this.currentFile = ExtensionApi.diagnostics.stickyFile ?? this.currentFile;
         this.refreshBugList();
@@ -133,6 +127,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
         if (element.command !== undefined) {
             const item = new TreeItem(element.description ?? element.command.title);
             item.command = element.command;
+            return item;
         }
 
         // Description nodes, also handles special case with no bugs

@@ -9,7 +9,7 @@ export class OverviewView implements TreeDataProvider<string> {
     constructor() {
         // TODO: Export this into a better descriptor object
         this.items = {
-            'bugs': () => 'Number of bugs: 10',
+            'bugs': () => 'Number of bugs: ',
             'warnings': () => 'Number of warnings: 50',
             'lastRun': () => 'Last run on: 2021. 05. 03. 11:23',
             'separator': () => '---',

@@ -1,20 +1,14 @@
 import { Trie, TrieMap } from 'mnemonist';
-import { Disposable, Event, EventEmitter, ExtensionContext, TextEditor, Uri, window, workspace } from 'vscode';
-import { DiagnosticParser, MetadataParser } from '../parser';
+import { Event, EventEmitter, ExtensionContext, TextEditor, Uri, window } from 'vscode';
+import { DiagnosticParser } from '../parser';
 import { CheckerMetadata, DiagnosticEntry, DiagnosticFile } from '../types';
+import { ExtensionApi as api } from './api';
 
 /**
  * API interface that provides Diagnostics data.  
  * Access the active instance via ExtensionApi.
  */
 export class DiagnosticsApi {
-    private _metadata?: CheckerMetadata;
-    /** 
-     * Content based on the metadata file only.
-     * Key: Source code file, value: .plist analysis file
-     */
-    private _metadataSourceFiles: TrieMap<string, string> = new TrieMap();
-
     private _openedFiles: string[] = [];
     private _diagnosticEntries: Map<string, DiagnosticFile> = new Map();
     /** 
@@ -63,78 +57,22 @@ export class DiagnosticsApi {
         ctx.subscriptions.push(this._diagnosticsUpdated = new EventEmitter());
         window.onDidChangeActiveTextEditor(this.onActiveEditorChanged, this, ctx.subscriptions);
         window.onDidChangeVisibleTextEditors(this.onDocumentsChanged, this, ctx.subscriptions);
+        api.metadata.metadataUpdated(this.onMetadataUpdated, this, ctx.subscriptions);
 
-        this.init(ctx);
+        this.init();
     }
 
-    init(ctx: ExtensionContext): void {
-        this.reloadMetadata()
-            .catch((err) => {
-                console.log(err);
-                window.showErrorMessage('Unexpected error when reloading metadata \nCheck console for more details');
-            })
-            .then(_ => {
-                this.onDocumentsChanged(window.visibleTextEditors);
-            });
-    }
+    init(): void {
 
-    async reloadMetadata(): Promise<void> {
-        let metadataPath = workspace.getConfiguration('codechecker.runner').get<string>('outputFolder');
-        if (!metadataPath) {
-            window.showWarningMessage('Metadata folder has invalid path - please change `CodeChecker > Runner > Output folder path` in the settings');
-            return;
-        }
-
-        if (!workspace.workspaceFolders) {
-            window.showInformationMessage('CodeChecker is disabled - open a workspace to get started');
-            // TODO: Disable
-            return;
-        }
-
-        const workspaceFolder = workspace.workspaceFolders[0].uri.path;
-
-        metadataPath = metadataPath
-            .replace(/\${workspaceRoot}/g, workspaceFolder)
-            .replace(/\${workspaceFolder}/g, workspaceFolder)
-            .replace(/\${cwd}/g, process.cwd())
-            .replace(/\${env\.([^}]+)}/g, (sub: string, envName: string) => process.env[envName] ?? '');
-
-        let metadata;
-
-        try {
-            // TODO: Support multiple tools
-            metadata = await MetadataParser.parse(metadataPath! + '/metadata.json');
-        } catch (err) {
-            // Silently ignore File not found errors
-            if (err.code !== 'ENOENT') {
-                console.error(err);
-                window.showErrorMessage('Failed to read CodeChecker metadata\nCheck console for more details');
-                // Not returning, because the cache needs to be cleared
-            }
-        }
-
-        this._metadata = metadata?.tools[0];
-
-        if (this._metadata) {
-            // reverse keys/values, so the source file becomes the key
-            const reverseSourceFiles = Object.entries(this._metadata.result_source_files)
-                .map(([analysisFile, sourceFile]) => [sourceFile, analysisFile]);
-    
-            this._metadataSourceFiles = TrieMap.from(Object.fromEntries(reverseSourceFiles));
-        } else {
-            this._metadataSourceFiles = new TrieMap();
-        }
-
-        await this.reloadDiagnostics();
     }
 
     // TODO: Add support for cancellation tokens
     async reloadDiagnostics(forceReload?: boolean): Promise<void> {
         // TODO: Allow loading all diagnostics at once
-        let plistFilesToLoad = this._openedFiles.map(file => this._metadataSourceFiles.get(file));
+        let plistFilesToLoad = this._openedFiles.map(file => api.metadata.sourceFiles.get(file));
 
         if (this._stickyFile !== undefined) {
-            plistFilesToLoad.push(this._metadataSourceFiles.get(this._stickyFile.path));
+            plistFilesToLoad.push(api.metadata.sourceFiles.get(this._stickyFile.path));
         }
 
         // Remove extra undefined/null values
@@ -229,6 +167,14 @@ export class DiagnosticsApi {
         this._openedFiles = uris.map(uri => uri.path);
 
         this.reloadDiagnostics()
+            .catch((err) => {
+                console.error(err);
+                window.showErrorMessage('Unexpected error when reloading diagnostics \nCheck console for more details');
+            });
+    }
+
+    onMetadataUpdated(metadata: CheckerMetadata | undefined) {
+        this.reloadDiagnostics(true)
             .catch((err) => {
                 console.error(err);
                 window.showErrorMessage('Unexpected error when reloading diagnostics \nCheck console for more details');

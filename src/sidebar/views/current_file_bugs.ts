@@ -40,7 +40,7 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
 
     // An editor change always triggers this change as well.
     onDiagnosticsUpdated() {
-        this.currentFile = ExtensionApi.diagnostics.stickyFile ?? this.currentFile;
+        this.currentFile = ExtensionApi.diagnostics.stickyFile ?? window.activeTextEditor?.document.uri;
         this.refreshBugList();
     }
 

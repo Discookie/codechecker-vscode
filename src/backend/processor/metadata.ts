@@ -55,7 +55,7 @@ export class MetadataApi {
             this._enabled = false;
         }
 
-        if (this.enabled && workspace.workspaceFolders === undefined) {
+        if (this.enabled && (workspace.workspaceFolders?.length ?? 0) === 0) {
             window.showInformationMessage('CodeChecker is disabled - open a workspace to get started');
 
             this._enabled = false;

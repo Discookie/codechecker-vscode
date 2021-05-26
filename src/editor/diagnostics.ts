@@ -83,17 +83,7 @@ export class DiagnosticRenderer {
             return false;
         };
 
-        const renderErrorsInFile = (uri: Uri) => {
-            if (!api.diagnostics.dataExistsForFile(uri)) {
-                // Mark the file for purging, if there's no other diagnostics
-                if (!diagnosticMap.has(uri.toString())) {
-                    diagnosticMap.set(uri.toString(), []);
-                }
-                return;
-            }
-    
-            const diagnosticData: DiagnosticEntry[] = api.diagnostics.getFileDiagnostics(uri);
-    
+        const renderErrorsInFile = (diagnosticData: DiagnosticEntry[]) => {
             // Render source diagnostics
             for (let entry of diagnosticData) {
                 if (entry === api.diagnostics.activeReprPath) {
@@ -146,11 +136,18 @@ export class DiagnosticRenderer {
             }
         };
 
-
+        
         // Update "regular" errors in files
         for (const uri of this._openedFiles) {
-            renderErrorsInFile(uri);
+            if (!diagnosticMap.has(uri.toString())) {
+                diagnosticMap.set(uri.toString(), []);
+            }
         }
+        
+        const fileErrors = api.diagnostics.getMultipleFileDiagnostics(
+            this._openedFiles.filter(uri => api.diagnostics.dataExistsForFile(uri))
+        );
+        renderErrorsInFile(fileErrors);
 
         // Render reproduction path, if applicable
         if (api.diagnostics.activeReprPath !== undefined) {

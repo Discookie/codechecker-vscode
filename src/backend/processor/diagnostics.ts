@@ -90,7 +90,7 @@ export class DiagnosticsApi {
                     loadedPlistFiles.add(plistFile);
                     continue;
                 }
-            
+
                 try {
                     const diagnosticEntry = await DiagnosticParser.parse(plistFile);
                     this._diagnosticEntries.set(plistFile, diagnosticEntry);
@@ -133,8 +133,9 @@ export class DiagnosticsApi {
         return this._diagnosticSourceFiles.has(path);
     }
 
-    /* Returns all opened diagnostics that run through the current file.
-     * Diagnostics that aren't in currently opened files are ignored.
+    /** Returns all opened diagnostics that run through the current file.
+     *  Diagnostics that aren't in currently opened files are ignored.
+     *  Calling getFileDiagnostics for multiple Uri-s may lead to duplicates.
      */
     getFileDiagnostics(uri: Uri): DiagnosticEntry[] {
         const path = uri.fsPath;
@@ -145,8 +146,20 @@ export class DiagnosticsApi {
             .flatMap(file => this._diagnosticEntries.get(file)?.diagnostics ?? []);
     }
 
-    listAllDiagnostics(): any[] /* TODO */ {
-        return [];
+    /** Returns a unique list of all diagnostics that run through the current files.
+     *  Calling getFileDiagnostics for multiple Uri-s may lead to duplicates.
+     */
+    getMultipleFileDiagnostics(uris: Uri[]): DiagnosticEntry[] {
+        const diagnosticSet = new Set<DiagnosticEntry>();
+
+        for (const uri of uris) {
+            const diagnostics = this.getFileDiagnostics(uri);
+            for (const diagnostic of diagnostics) {
+                diagnosticSet.add(diagnostic);
+            }
+        }
+
+        return [...diagnosticSet.values()];
     }
 
     private _diagnosticsUpdated: EventEmitter<void>;

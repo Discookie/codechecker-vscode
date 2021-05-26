@@ -136,8 +136,14 @@ export class AllBugsView implements TreeDataProvider<AllBugsMetadata> {
                 { ...element, description: '---' }
             ];
 
+            const limit = 100;
+
+            if (bugs.length > limit) {
+                commands.splice(1, 0, {...element, description: 'Showing the first 100'});
+            }
+
             const items: AllBugsMetadata[]  = makeArray(
-                bugs.length,
+                Math.min(bugs.length, limit),
                 (idx) => {
                     return {
                         ...element,

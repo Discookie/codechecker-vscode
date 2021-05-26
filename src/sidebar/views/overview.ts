@@ -52,11 +52,11 @@ export class OverviewView implements TreeDataProvider<string> {
                 const ms = Math.floor(interval * 1000) % 1000;
 
                 if (hours > 0 || minutes > 0) {
-                    return 'Build length: ' + 
-                        (hours > 0 ? (hours + ':') : '') +
-                        minutes + ':' + seconds + ' s';
+                    return 'Last run\'s length: ' + 
+                        (hours > 0 ? (hours + ':' + minutes.toPrecision(2)) : minutes) +
+                        seconds.toPrecision(4) + ' s';
                 } else {
-                    return 'Build length: ' + 
+                    return 'Last run\'s length: ' + 
                         seconds + '.' + ms + ' s';
                 }
             },

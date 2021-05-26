@@ -17,7 +17,31 @@
     "commands": [
       {
         "command": "codechecker-vscode.helloWorld",
-        "title": "Hello World"
+        "title": "CodeChecker: Hello World"
+      },
+      {
+        "command": "codechecker.editor.toggleAllBugs",
+        "title": "CodeChecker: Show/Hide all bugs by default"
+      },
+      {
+        "command": "codechecker.editor.toggleSteps",
+        "title": "CodeChecker: Show/Hide reproduction steps"
+      },
+      {
+        "command": "codechecker.editor.jumpToBug",
+        "title": "CodeChecker: Jump to bug"
+      },
+      {
+        "command": "codechecker.editor.jumpToStep",
+        "title": "CodeChecker: Jump to step"
+      },
+      {
+        "command": "codechecker.editor.nextStep",
+        "title": "CodeChecker: Next reproduction step"
+      },
+      {
+        "command": "codechecker.editor.previousStep",
+        "title": "CodeChecker: Previous reproduction step"
       }
     ],
     "configuration": {
@@ -27,11 +51,6 @@
           "type": "string",
           "description": "Path to the CodeChecker executable",
           "default": "CodeChecker"
-        },
-        "codechecker.runner.executableArgs": {
-          "type": ["string", "null"],
-          "description": "Additional arguments to the CodeChecker executable",
-          "default": null
         },
         "codechecker.runner.outputFolder": {
           "type": "string",
@@ -43,16 +62,6 @@
           "description": "Toggles showing bugs inside the editor.",
           "default": "true"
         },
-        "codechecker.editor.showReproductionPath": {
-          "type": "boolean",
-          "description": "Toggles showing the full reproduction path inside the editor.",
-          "default": "false"
-        },
-        "codechecker.sidebar.showQuickMenu": {
-          "type": "boolean",
-          "description": "Toggles the quick menu action buttons on or off. Does not affect the statistics shown there.",
-          "default": "true"
-        },
         "codechecker.sidebar.defaultSort": {
           "type": "string",
           "description": "Sets the default sort for the 'All files' section.",
@@ -60,6 +69,20 @@
         }
       }
     },
+    "keybindings": [
+      {
+        "command": "codechecker.editor.nextStep",
+        "key": "ctrl-f7",
+        "mac": "cmd-f7",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "codechecker.editor.previousStep",
+        "key": "ctrl-shift-f7",
+        "mac": "cmd-shift-f7",
+        "when": "editorTextFocus"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {

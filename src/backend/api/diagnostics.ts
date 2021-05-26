@@ -25,10 +25,7 @@ export class DiagnosticsApi {
     }
     public set stickyFile(value: Uri | undefined) {
         this._stickyFile = value;
-
-        if (this._stickyFile?.path !== window.activeTextEditor?.document.uri.path) {
-            this._ignoreNextActiveEditorChange = true;
-        }
+        this._ignoreNextActiveEditorChange = true;
 
         this.reloadDiagnostics();
     }
@@ -72,7 +69,7 @@ export class DiagnosticsApi {
         let plistFilesToLoad = this._openedFiles.map(file => api.metadata.sourceFiles.get(file));
 
         if (this._stickyFile !== undefined) {
-            plistFilesToLoad.push(api.metadata.sourceFiles.get(this._stickyFile.path));
+            plistFilesToLoad.push(api.metadata.sourceFiles.get(this._stickyFile.fsPath));
         }
 
         // Remove extra undefined/null values
@@ -127,7 +124,7 @@ export class DiagnosticsApi {
     }
 
     dataExistsForFile(uri: Uri): boolean {
-        const path = uri.path;
+        const path = uri.fsPath;
         
         return this._diagnosticSourceFiles.has(path);
     }
@@ -136,7 +133,7 @@ export class DiagnosticsApi {
      * Diagnostics that aren't in currently opened files are ignored.
      */
     getFileDiagnostics(uri: Uri): DiagnosticEntry[] {
-        const path = uri.path;
+        const path = uri.fsPath;
 
         const diagnosticFiles = this._diagnosticSourceFiles.get(path) ?? [];
 
@@ -164,7 +161,7 @@ export class DiagnosticsApi {
 
     onDocumentsChanged(event: TextEditor[]): void {
         const uris = event.map(editor => editor.document.uri);
-        this._openedFiles = uris.map(uri => uri.path);
+        this._openedFiles = uris.map(uri => uri.fsPath);
 
         this.reloadDiagnostics()
             .catch((err) => {

@@ -12,28 +12,16 @@ export class DiagnosticRenderer {
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._diagnosticCollection = languages.createDiagnosticCollection('codechecker'));
 
-        window.onDidChangeVisibleTextEditors(this.onDocumentsChanged, this, ctx.subscriptions);
-        workspace.onDidChangeTextDocument(this.onDocumentChanged, this, ctx.subscriptions);
         api.diagnostics.diagnosticsUpdated(this.onDiagnosticUpdated, this, ctx.subscriptions);
     }
 
     onDiagnosticUpdated() {
-        this.updateAllDiagnostics();
-    }
+        this._openedFiles = window.visibleTextEditors.map(editor => editor.document.uri);
 
-    onDocumentsChanged(event: TextEditor[]) {
-        const uriList = event.map(editor => editor.document.uri);
-
-        this._openedFiles = uriList;
-        
-        if (ExtensionApi.diagnostics.stickyFile !== undefined) {
-            this._openedFiles.push(ExtensionApi.diagnostics.stickyFile);
+        if (api.diagnostics.stickyFile) {
+            this._openedFiles.push(api.diagnostics.stickyFile);
         }
 
-        this.updateAllDiagnostics();
-    }
-
-    onDocumentChanged(event: TextDocumentChangeEvent) {
         this.updateAllDiagnostics();
     }
 

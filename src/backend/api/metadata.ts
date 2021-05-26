@@ -68,7 +68,7 @@ export class MetadataApi {
             return;
         }
 
-        const workspaceFolder = workspace.workspaceFolders![0].uri.path;
+        const workspaceFolder = workspace.workspaceFolders![0].uri.fsPath;
 
         metadataPath = metadataPath!
             .replace(/\${workspaceRoot}/g, workspaceFolder)

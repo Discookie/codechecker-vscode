@@ -33,15 +33,16 @@ export class NavigationHandler {
             file = Uri.file(file);
         }
 
-        if (keepCurrentFile) {
-            ExtensionApi.diagnostics.stickyFile = file;
-        }
 
         const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
         const location = diagnostic?.location;
-        file = location !== undefined ? Uri.file(diagnostic.files[location.file]) : file;
+        const targetFile = location !== undefined ? Uri.file(diagnostic.files[location.file]) : file;
+        
+        if (keepCurrentFile && file.fsPath !== targetFile.fsPath) {
+            ExtensionApi.diagnostics.stickyFile = file;
+        }
 
-        window.showTextDocument(file, {
+        window.showTextDocument(targetFile, {
             selection: location !== undefined ? new Range(
                 location.line - 1,
                 location.col - 1,
@@ -60,19 +61,20 @@ export class NavigationHandler {
             file = Uri.file(file);
         }
 
-        if (keepCurrentFile) {
-            ExtensionApi.diagnostics.stickyFile = file;
-        }
-
         const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
         const diagnosticLocation = diagnostic?.location;
         const step = diagnostic?.path.filter(elem => elem.kind === AnalysisPathKind.Event)[stepIndex] as AnalysisPathEvent;
         const stepLocation = step?.location ?? diagnosticLocation;
-        file = stepLocation !== undefined ? Uri.file(diagnostic.files[stepLocation.file])
+        const targetFile = stepLocation !== undefined ? Uri.file(diagnostic.files[stepLocation.file])
             : diagnosticLocation !== undefined ? Uri.file(diagnostic.files[diagnosticLocation.file])
             : file;
+            
+        
+        if (keepCurrentFile && file.fsPath !== targetFile.fsPath) {
+            ExtensionApi.diagnostics.stickyFile = file;
+        }
 
-        window.showTextDocument(file, {
+        window.showTextDocument(targetFile, {
             selection: stepLocation !== undefined ? new Range(
                 stepLocation.line - 1,
                 stepLocation.col - 1,
@@ -140,7 +142,7 @@ export class NavigationHandler {
             }
         }
 
-        return undefined;
+        return lastIdx;
     }
 
     nextStep() {

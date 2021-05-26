@@ -1,7 +1,5 @@
 import { ExtensionContext } from 'vscode';
-import { AggregateDataApi } from './aggregate';
-import { DiagnosticsApi } from './diagnostics';
-import { MetadataApi } from './metadata';
+import { AggregateDataApi, DiagnosticsApi, MetadataApi } from './processor';
 
 export class ExtensionApi {
     static init(ctx: ExtensionContext): void {

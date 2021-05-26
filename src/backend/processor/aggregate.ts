@@ -1,7 +1,7 @@
 import { Event, EventEmitter, ExtensionContext, window } from "vscode";
 import { DiagnosticParser } from "../parser";
 import { AggregateData, AggregateEntry, AnalysisPathKind, CheckerMetadata } from "../types";
-import { ExtensionApi } from "./api";
+import { ExtensionApi } from "../api";
 
 export class AggregateDataApi {
     constructor(ctx: ExtensionContext) {

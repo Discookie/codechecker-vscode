@@ -2,7 +2,7 @@ import { Trie, TrieMap } from 'mnemonist';
 import { Event, EventEmitter, ExtensionContext, TextEditor, Uri, window } from 'vscode';
 import { DiagnosticParser } from '../parser';
 import { CheckerMetadata, DiagnosticEntry, DiagnosticFile } from '../types';
-import { ExtensionApi as api } from './api';
+import { ExtensionApi as api } from '../api';
 
 /**
  * API interface that provides Diagnostics data.  

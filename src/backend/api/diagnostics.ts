@@ -21,7 +21,7 @@ export class DiagnosticsApi {
     private _ignoreNextActiveEditorChange = false;
 
     public get stickyFile(): Uri | undefined {
-        return this._stickyFile;
+        return this._stickyFile ?? (this._activeReprPath ?? [])[0];
     }
     public set stickyFile(value: Uri | undefined) {
         this._stickyFile = value;
@@ -30,15 +30,17 @@ export class DiagnosticsApi {
         this.reloadDiagnostics();
     }
 
-    private _activeReprPath?: DiagnosticEntry;
+    private _activeReprPath?: [Uri, number];
     public get activeReprPath(): DiagnosticEntry | undefined {
-        return this._activeReprPath;
+        return this._activeReprPath !== undefined 
+            ? this.getFileDiagnostics(this._activeReprPath[0])[this._activeReprPath[1]]
+            : undefined;
     }
     
     public setActiveReprPath(filename: Uri, idx: number) {
         const diags = this.getFileDiagnostics(filename);
         if ((diags ?? [])[idx] !== undefined) {
-            this._activeReprPath = diags[idx];
+            this._activeReprPath = [filename, idx];
             this._diagnosticsUpdated.fire();
         }
     }
@@ -68,8 +70,8 @@ export class DiagnosticsApi {
         // TODO: Allow loading all diagnostics at once
         let plistFilesToLoad = this._openedFiles.map(file => api.metadata.sourceFiles.get(file));
 
-        if (this._stickyFile !== undefined) {
-            plistFilesToLoad.push(api.metadata.sourceFiles.get(this._stickyFile.fsPath));
+        if (this.stickyFile !== undefined) {
+            plistFilesToLoad.push(api.metadata.sourceFiles.get(this.stickyFile.fsPath));
         }
 
         // Remove extra undefined/null values

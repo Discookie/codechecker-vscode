@@ -1,5 +1,5 @@
 import { Diagnostic, DiagnosticCollection, DiagnosticRelatedInformation, DiagnosticSeverity, ExtensionContext, languages, Location, Position, Range, TextDocument, TextDocumentChangeEvent, TextEditor, Uri, window, workspace } from 'vscode';
-import { AnalysisLocation, AnalysisPathEvent, AnalysisPathKind, DiagnosticEntry } from '../backend/types';
+import { AnalysisLocation, AnalysisPathEvent, AnalysisPathKind, AnalysisRange, DiagnosticEntry } from '../backend/types';
 import { ExtensionApi as api, ExtensionApi } from '../backend/api';
 
 // TODO: implement api
@@ -48,20 +48,15 @@ export class DiagnosticRenderer {
             severity: DiagnosticSeverity,
             relatedInformation: DiagnosticRelatedInformation[]
         ): boolean => {
-            let affectedFile = Uri.file(entry.files[renderedDiag.location.file]);
+            const affectedFile = Uri.file(entry.files[renderedDiag.location.file]);
 
-            // TODO: Assuming there's always at least one range
-            if ((renderedDiag.ranges?.length ?? 0) === 0) {
-                return true;
-            }
-
-            
-            const ranges = (renderedDiag.ranges ?? [])
-            .map(range => new Range(
-                range[0].line-1,
-                range[0].col-1,
-                range[1].line-1,
-                range[1].col,
+            // When there's no ranges, render the location
+            const ranges: Range[] = (renderedDiag.ranges ?? [[renderedDiag.location, renderedDiag.location]])
+                .map(([start, end]) => new Range(
+                    start.line-1,
+                    start.col-1,
+                    end.line-1,
+                    end.col,
                 ));
                 
             // TODO: Find solution for multiple ranges with same error
@@ -72,14 +67,7 @@ export class DiagnosticRenderer {
 
             const diagnostics = diagnosticMap.get(affectedFile.toString()) ?? [];
 
-            for (const diagRange of renderedDiag.ranges ?? []) {
-                const range = new Range(
-                    diagRange[0].line-1,
-                    diagRange[0].col-1,
-                    diagRange[1].line-1,
-                    diagRange[1].col,
-                );
-
+            for (const range of ranges) {
                 const finalDiag: Diagnostic = {
                     message: renderedDiag.message,
                     range,

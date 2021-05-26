@@ -1,5 +1,6 @@
 import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeView, window } from 'vscode';
 import { ExtensionApi } from '../../backend/api';
+import { AnalyzeType, ExecutorApi } from '../../backend/runner';
 import { AggregateData } from '../../backend/types';
 import { CommandItem } from './items';
 
@@ -12,8 +13,9 @@ export class OverviewView implements TreeDataProvider<string> {
         'buildLength',
         'analyzers',
         'separator',
+        'reloadMetadata',
         'rebuildFile',
-        'toggleErrors'
+        'rebuildProject',
     ];
     protected notFoundItemsList = [
         'notfound',
@@ -60,13 +62,20 @@ export class OverviewView implements TreeDataProvider<string> {
             },
             'analyzers': () => 'Used analyzers: ' + ExtensionApi.aggregate.aggregateData!.analyzers.join(', '),
             'separator': () => '---',
-            'rebuildFile': new CommandItem('Rebuild current file', {
-                title: 'rebuildCurrentFile', 
-                command: 'codechecker-vscode.build.rebuildCurrentFile'
+            'reloadMetadata': new CommandItem('Reload CodeChecker metadata', {
+                title: 'reloadMetadata', 
+                command: 'codechecker.processor.reloadMetadata',
+                arguments: []
             }),
-            'toggleErrors': new CommandItem('Toggle displaying errors in code', {
-                title: 'toggleErrors', 
-                command: 'codechecker-vscode.diagnostics.toggleErrors'
+            'rebuildFile': new CommandItem('Re-analyze current file', {
+                title: 'rebuildCurrentFile', 
+                command: 'workbench.action.tasks.runTask',
+                arguments: [{type: ExecutorApi.codeCheckerType, analyzeType: AnalyzeType.analyzeFile}]
+            }),
+            'rebuildProject': new CommandItem('Re-analyze entire project', {
+                title: 'rebuildCurrentFile', 
+                command: 'workbench.action.tasks.runTask',
+                arguments: [{type: ExecutorApi.codeCheckerType, analyzeType: AnalyzeType.analyzeProject}]
             }),
         };
         

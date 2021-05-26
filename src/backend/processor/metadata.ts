@@ -1,5 +1,5 @@
 import { TrieMap } from "mnemonist";
-import { ConfigurationChangeEvent, Event, EventEmitter, ExtensionContext, window, workspace } from "vscode";
+import { commands, ConfigurationChangeEvent, Event, EventEmitter, ExtensionContext, tasks, window, workspace } from "vscode";
 import { MetadataParser } from "../parser";
 import { CheckerMetadata } from "../types";
 
@@ -29,7 +29,9 @@ export class MetadataApi {
 
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._metadataUpdated = new EventEmitter());
+        ctx.subscriptions.push(commands.registerCommand('codechecker.processor.reloadMetadata', this.reloadMetadata, this));
         workspace.onDidChangeConfiguration(this.onConfigChanged, this, ctx.subscriptions);
+        tasks.onDidEndTask(this.reloadMetadata, this, ctx.subscriptions);
 
         this.init();
     }

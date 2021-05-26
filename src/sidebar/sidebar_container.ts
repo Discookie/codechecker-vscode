@@ -3,7 +3,7 @@ import { CurrentFileView, OverviewView } from './views';
 
 export class SidebarContainer {
     static init(ctx: ExtensionContext): void {
-        this._overviewView = new OverviewView();
+        this._overviewView = new OverviewView(ctx);
         this._currentFileView = new CurrentFileView(ctx);
     }
 

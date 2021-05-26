@@ -36,34 +36,42 @@ export class AggregateDataApi {
 
         const entries = [];
 
-        for (const [sourceFile, plistFile] of ExtensionApi.metadata.sourceFiles.entries()) {
-            try {
-                const diagnosticFile = await DiagnosticParser.parse(plistFile);
+        let errorFlag = false;
 
-                for (const [idx, diagnostic] of diagnosticFile.diagnostics.entries()) {
-                    const aggregateEntry: AggregateEntry = {
-                        description: diagnostic.description,
-                        location: {
-                            ...diagnostic.location,
-                            file: diagnosticFile.files[diagnostic.location.file],
-                            // eslint-disable-next-line @typescript-eslint/naming-convention
-                            source_file: sourceFile,
-                            // eslint-disable-next-line @typescript-eslint/naming-convention
-                            source_idx: idx
-                        },
-                        category: diagnostic.category,
-                        // eslint-disable-next-line @typescript-eslint/naming-convention
-                        analyzer_name: '', // TODO: Read out
-                        // eslint-disable-next-line @typescript-eslint/naming-convention
-                        path_length: diagnostic.path.filter(elem => elem.kind === AnalysisPathKind.Event).length
-                    };
+        for (const [sourceFile, plistFiles] of ExtensionApi.metadata.sourceFiles.entries()) {
+            for (const plistFile of plistFiles) {
+                try {
+                    const diagnosticFile = await DiagnosticParser.parse(plistFile);
 
-                    entries.push(aggregateEntry);
+                    for (const [idx, diagnostic] of diagnosticFile.diagnostics.entries()) {
+                        const aggregateEntry: AggregateEntry = {
+                            description: diagnostic.description,
+                            location: {
+                                ...diagnostic.location,
+                                file: diagnosticFile.files[diagnostic.location.file],
+                                // eslint-disable-next-line @typescript-eslint/naming-convention
+                                source_file: sourceFile,
+                                // eslint-disable-next-line @typescript-eslint/naming-convention
+                                source_idx: idx
+                            },
+                            category: diagnostic.category,
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            analyzer_name: '', // TODO: Read out
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            path_length: diagnostic.path.filter(elem => elem.kind === AnalysisPathKind.Event).length
+                        };
+
+                        entries.push(aggregateEntry);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    errorFlag = true;
                 }
-            } catch (err) {
-                console.error(err);
-                window.showErrorMessage('Failed to read CodeChecker metadata\nCheck console for details');
             }
+        }
+
+        if (errorFlag) {
+            window.showErrorMessage('Failed to read CodeChecker aggregate data\nCheck console for details');
         }
 
         const localMeta = ExtensionApi.metadata.metadata;

@@ -84,19 +84,21 @@ export class DiagnosticsApi {
         let loadedPlistFiles = new Trie<string>();
 
         // Load new .plist files
-        for (const plistFile of plistFilesToLoad) {
-            if (this._diagnosticEntries.has(plistFile)) {
-                loadedPlistFiles.add(plistFile);
-                continue;
-            }
-
-            try {
-                const diagnosticEntry = await DiagnosticParser.parse(plistFile);
-                this._diagnosticEntries.set(plistFile, diagnosticEntry);
-                loadedPlistFiles.add(plistFile);
-            } catch (err) {
-                console.error(err);
-                window.showErrorMessage('Failed to read CodeChecker metadata\nCheck console for details');
+        for (const plistFiles of plistFilesToLoad) {
+            for (const plistFile of plistFiles) {
+                if (this._diagnosticEntries.has(plistFile)) {
+                    loadedPlistFiles.add(plistFile);
+                    continue;
+                }
+            
+                try {
+                    const diagnosticEntry = await DiagnosticParser.parse(plistFile);
+                    this._diagnosticEntries.set(plistFile, diagnosticEntry);
+                    loadedPlistFiles.add(plistFile);
+                } catch (err) {
+                    console.error(err);
+                    window.showErrorMessage('Failed to read CodeChecker metadata\nCheck console for details');
+                }
             }
         }
 

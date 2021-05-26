@@ -9,12 +9,12 @@ export class MetadataApi {
         return this._metadata;
     }
     
-    private _metadataSourceFiles: TrieMap<string, string> = new TrieMap();
+    private _metadataSourceFiles: TrieMap<string, string[]> = new TrieMap();
     /** 
      * Content based on the metadata file only.
-     * Key: Source code file, value: .plist analysis file
+     * Key: Source code file, value: .plist analysis files
      */
-    public get sourceFiles(): TrieMap<string, string> {
+    public get sourceFiles(): TrieMap<string, string[]> {
         return this._metadataSourceFiles;
     }
     
@@ -94,14 +94,15 @@ export class MetadataApi {
 
         this._metadata = metadata?.tools[0];
 
+        this._metadataSourceFiles = new TrieMap();
+
         if (this._metadata) {
             // reverse keys/values, so the source file becomes the key
-            const reverseSourceFiles = Object.entries(this._metadata.result_source_files)
-                .map(([analysisFile, sourceFile]) => [sourceFile, analysisFile]);
-    
-            this._metadataSourceFiles = TrieMap.from(Object.fromEntries(reverseSourceFiles));
-        } else {
-            this._metadataSourceFiles = new TrieMap();
+            for (const [analysisFile, sourceFile] of Object.entries(this._metadata.result_source_files)) {
+                const entries = this._metadataSourceFiles.get(sourceFile) ?? [];
+                entries.push(analysisFile);
+                this._metadataSourceFiles.set(sourceFile, entries);
+            }
         }
 
         this._metadataUpdated.fire(this._metadata);

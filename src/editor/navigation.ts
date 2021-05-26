@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, Position, Range, Uri, window } from "vscode";
 import { ExtensionApi } from "../backend/api";
-import { AnalysisPathEvent, AnalysisPathKind, DiagnosticEntry } from "../backend/types";
+import { AggregateEntry, AnalysisPathEvent, AnalysisPathKind, DiagnosticEntry } from "../backend/types";
 import { SidebarContainer } from "../sidebar";
 
 export class NavigationHandler {
@@ -28,18 +28,38 @@ export class NavigationHandler {
         }
     }
 
-    jumpToBug(file: Uri | string, bugIndex: number, keepCurrentFile: boolean): void {
+    jumpToBug(file: Uri | string, bugIndex: number, keepCurrentFile: boolean, isAggregate?: boolean): void {
         if (typeof file === 'string') {
             file = Uri.file(file);
         }
 
-
-        const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
-        const location = diagnostic?.location;
-        const targetFile = location !== undefined ? Uri.file(diagnostic.files[location.file]) : file;
-        
-        if (keepCurrentFile && file.fsPath !== targetFile.fsPath) {
+        // Navigating to a fresh file, eg. via the All Bugs menu
+        if (window.activeTextEditor?.document.uri.fsPath !== file.fsPath) {
             ExtensionApi.diagnostics.stickyFile = file;
+        }
+
+        let diagnostic: DiagnosticEntry | AggregateEntry | undefined;
+        let location;
+        let targetFile;
+
+        if (isAggregate) {
+            diagnostic = (ExtensionApi.aggregate.aggregateData?.entries ?? [])[bugIndex];
+            location = diagnostic?.location;
+            targetFile = location !== undefined ? Uri.file(location.file) : file;
+            
+            // Navigating into a new file, eg. via clickin in the All Bugs menu
+            if (keepCurrentFile && file.fsPath !== window.activeTextEditor?.document.uri.fsPath) {
+                ExtensionApi.diagnostics.stickyFile = file;
+            }
+        } else {
+            diagnostic = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
+            location = diagnostic?.location;
+            targetFile = location !== undefined ? Uri.file(diagnostic.files[location.file]) : file;
+            
+            // Navigating away from a 'kept' file, eg. via clicking on Jump to bug
+            if (keepCurrentFile && file.fsPath !== targetFile.fsPath) {
+                ExtensionApi.diagnostics.stickyFile = file;
+            }
         }
 
         window.showTextDocument(targetFile, {
@@ -61,6 +81,11 @@ export class NavigationHandler {
             file = Uri.file(file);
         }
 
+        // Navigating to a fresh file, eg. via the All Bugs menu
+        if (window.activeTextEditor?.document.uri.fsPath !== file.fsPath) {
+            ExtensionApi.diagnostics.stickyFile = file;
+        }
+
         const diagnostic: DiagnosticEntry | undefined = ExtensionApi.diagnostics.getFileDiagnostics(file)[bugIndex];
         const diagnosticLocation = diagnostic?.location;
         const step = diagnostic?.path.filter(elem => elem.kind === AnalysisPathKind.Event)[stepIndex] as AnalysisPathEvent;
@@ -68,8 +93,8 @@ export class NavigationHandler {
         const targetFile = stepLocation !== undefined ? Uri.file(diagnostic.files[stepLocation.file])
             : diagnosticLocation !== undefined ? Uri.file(diagnostic.files[diagnosticLocation.file])
             : file;
-            
-        
+
+        // Navigating away from a 'kept' file, eg. via clicking on Jump to bug
         if (keepCurrentFile && file.fsPath !== targetFile.fsPath) {
             ExtensionApi.diagnostics.stickyFile = file;
         }

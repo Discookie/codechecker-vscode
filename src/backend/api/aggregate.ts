@@ -36,16 +36,20 @@ export class AggregateDataApi {
 
         const entries = [];
 
-        for (const plistFile of ExtensionApi.metadata.sourceFiles.values()) {
+        for (const [sourceFile, plistFile] of ExtensionApi.metadata.sourceFiles.entries()) {
             try {
                 const diagnosticFile = await DiagnosticParser.parse(plistFile);
 
-                for (const diagnostic of diagnosticFile.diagnostics) {
+                for (const [idx, diagnostic] of diagnosticFile.diagnostics.entries()) {
                     const aggregateEntry: AggregateEntry = {
                         description: diagnostic.description,
                         location: {
                             ...diagnostic.location,
-                            file: diagnosticFile.files[diagnostic.location.file]
+                            file: diagnosticFile.files[diagnostic.location.file],
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            source_file: sourceFile,
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            source_idx: idx
                         },
                         category: diagnostic.category,
                         // eslint-disable-next-line @typescript-eslint/naming-convention

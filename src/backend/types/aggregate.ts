@@ -4,6 +4,9 @@ export interface AggregateLocation {
     readonly file: string;
     readonly line: number;
     readonly col: number;
+
+    readonly source_file: string;
+    readonly source_idx: number;
 }
 
 export interface AggregateEntry {

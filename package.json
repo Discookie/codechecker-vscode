@@ -65,7 +65,8 @@
         "codechecker.sidebar.defaultSort": {
           "type": "string",
           "description": "Sets the default sort for the 'All files' section.",
-          "default": "true"
+          "default": "filename",
+          "enum": ["filename", "reprPath", "analyzer"]
         }
       }
     },
@@ -102,7 +103,13 @@
         },
         {
           "id": "codechecker.views.currentFile",
-          "name": "Current File Bugs",
+          "name": "Bugs in Current File",
+          "icon": "media/codechecker_logo.png",
+          "contextualTitle": "CodeChecker"
+        },
+        {
+          "id": "codechecker.views.allBugs",
+          "name": "All Bugs in Project",
           "icon": "media/codechecker_logo.png",
           "contextualTitle": "CodeChecker"
         }

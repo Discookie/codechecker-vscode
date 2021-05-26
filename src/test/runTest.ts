@@ -1,23 +1,43 @@
-import * as path from 'path';
+import { spawnSync } from 'child_process';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 import { runTests } from 'vscode-test';
 
 async function main() {
-	try {
-		// The folder containing the Extension Manifest package.json
-		// Passed to `--extensionDevelopmentPath`
-		const extensionDevelopmentPath = path.resolve(__dirname, '../../');
+    try {
+        const extensionDevelopmentPath = resolve(__dirname, '../../');
+        const extensionTestsPath = resolve(__dirname, './suite/index');
 
-		// The path to test runner
-		// Passed to --extensionTestsPath
-		const extensionTestsPath = path.resolve(__dirname, './suite/index');
+        const testWorkspace = resolve(__dirname, './test-data');
+        
+        // Run CodeChecker on the test workspace first
+        const result = spawnSync(
+            'CodeChecker check -b "c++ -std:c++17 file.cpp -o file" -o ./codechecker',
+            { cwd: testWorkspace }
+        );
 
-		// Download VS Code, unzip it and run the integration test
-		await runTests({ extensionDevelopmentPath, extensionTestsPath });
-	} catch (err) {
-		console.error('Failed to run tests');
-		process.exit(1);
-	}
+        if (result.error !== undefined) {
+            if (!existsSync(resolve(testWorkspace, './codechecker'))) {
+                console.log('CodeChecker not found, please run CodeChecker manually', resolve(testWorkspace, './codechecker'));
+                throw result.error;
+            }
+
+            console.log('CodeChecker not found, testing on existing data');
+        } else {
+            console.log('CodeChecker ran successfully on initial folder');
+        }
+
+        // After that's done, run the tests
+        await runTests({
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            launchArgs: [testWorkspace]
+        });
+    } catch (err) {
+        console.error('Failed to run tests');
+        process.exit(1);
+    }
 }
 
 main();

@@ -137,8 +137,9 @@
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "test-compile": "tsc -p ./",
+    "test-copy-data": "copyfiles -u 3 ./src/test/test-data/* ./src/test/test-data/**/* ./out/test/test-data",
     "test-watch": "tsc -watch -p ./",
-    "pretest": "yarn run test-compile && yarn run lint",
+    "pretest": "yarn run test-compile && yarn run test-copy-data && yarn run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
@@ -149,6 +150,7 @@
     "@types/vscode": "^1.55.0",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
+    "copyfiles": "^2.4.1",
     "eslint": "^7.19.0",
     "glob": "^7.1.6",
     "mocha": "^8.2.1",

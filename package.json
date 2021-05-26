@@ -84,6 +84,21 @@
         "when": "editorTextFocus"
       }
     ],
+    "taskDefinitions": [
+      {
+        "type": "codeChecker",
+        "required": [
+          "analyzeType"
+        ],
+        "properties": {
+          "analyzeType": {
+            "type": "string",
+            "description": "Type of analysis to execute.",
+            "enum": ["analyzeProject", "analyzeFile"]
+          }
+        }
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {

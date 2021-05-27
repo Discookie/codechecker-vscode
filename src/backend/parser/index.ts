@@ -1,2 +1,2 @@
-export * as DiagnosticParser from './diagnostics';
-export * as MetadataParser from './metadata';
+export * from './diagnostics';
+export * from './metadata';

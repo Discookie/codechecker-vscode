@@ -4,7 +4,7 @@ import { promisify, TextDecoder } from 'util';
 import { Uri, workspace } from 'vscode';
 import { DiagnosticFile } from '../types';
 
-export async function parse(path: string): Promise<DiagnosticFile> {
+export async function parseDiagnostics(path: string): Promise<DiagnosticFile> {
 
     const rawFileContents = await workspace.fs.readFile(Uri.file(path));
 

@@ -1,5 +1,5 @@
 import { Event, EventEmitter, ExtensionContext, window } from "vscode";
-import { DiagnosticParser } from "../parser";
+import { parseDiagnostics } from "../parser";
 import { AggregateData, AggregateEntry, AnalysisPathKind, CheckerMetadata } from "../types";
 import { ExtensionApi } from "../api";
 
@@ -41,7 +41,7 @@ export class AggregateDataApi {
         for (const [sourceFile, plistFiles] of ExtensionApi.metadata.sourceFiles.entries()) {
             for (const plistFile of plistFiles) {
                 try {
-                    const diagnosticFile = await DiagnosticParser.parse(plistFile);
+                    const diagnosticFile = await parseDiagnostics(plistFile);
 
                     for (const [idx, diagnostic] of diagnosticFile.diagnostics.entries()) {
                         const aggregateEntry: AggregateEntry = {

@@ -3,7 +3,7 @@ import { Uri, workspace } from 'vscode';
 import { MetadataFile } from '../types';
 
 // TODO: Interruptible
-export async function parse(path: string): Promise<MetadataFile> {
+export async function parseMetadata(path: string): Promise<MetadataFile> {
     const rawFileContents = await workspace.fs.readFile(Uri.file(path));
 
     const fileContents = new TextDecoder('utf-8').decode(rawFileContents);

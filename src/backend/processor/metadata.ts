@@ -1,6 +1,6 @@
 import { TrieMap } from "mnemonist";
 import { commands, ConfigurationChangeEvent, Event, EventEmitter, ExtensionContext, tasks, window, workspace } from "vscode";
-import { MetadataParser } from "../parser";
+import { parseMetadata } from "../parser";
 import { CheckerMetadata } from "../types";
 
 export class MetadataApi {
@@ -82,7 +82,7 @@ export class MetadataApi {
 
         try {
             // TODO: Support multiple tools
-            metadata = await MetadataParser.parse(metadataPath! + '/metadata.json');
+            metadata = await parseMetadata(metadataPath! + '/metadata.json');
         } catch (err) {
             // Silently ignore File not found errors
             if (err.code !== 'FileNotFound') {

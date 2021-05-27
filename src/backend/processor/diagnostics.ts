@@ -1,6 +1,6 @@
 import { Trie, TrieMap } from 'mnemonist';
 import { Event, EventEmitter, ExtensionContext, TextEditor, Uri, window } from 'vscode';
-import { DiagnosticParser } from '../parser';
+import { parseDiagnostics } from '../parser';
 import { CheckerMetadata, DiagnosticEntry, DiagnosticFile } from '../types';
 import { ExtensionApi as api } from '../api';
 
@@ -92,7 +92,7 @@ export class DiagnosticsApi {
                 }
 
                 try {
-                    const diagnosticEntry = await DiagnosticParser.parse(plistFile);
+                    const diagnosticEntry = await parseDiagnostics(plistFile);
                     this._diagnosticEntries.set(plistFile, diagnosticEntry);
                     loadedPlistFiles.add(plistFile);
                 } catch (err) {

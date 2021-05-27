@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { parse as parseMetadata } from '../../../../backend/parser/metadata';
-import { parse as parseDiagnostics } from '../../../../backend/parser/diagnostics';
+import { parseMetadata } from '../../../../backend/parser/metadata';
+import { parseDiagnostics } from '../../../../backend/parser/diagnostics';
 import { glob } from 'glob';
 import { promisify } from 'util';
 import { AnalysisPathEvent, AnalysisPathKind } from '../../../../backend/types';

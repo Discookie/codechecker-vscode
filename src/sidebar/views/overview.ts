@@ -2,7 +2,18 @@ import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeI
 import { ExtensionApi } from '../../backend/api';
 import { AnalyzeType, ExecutorApi } from '../../backend/runner';
 import { AggregateData } from '../../backend/types';
-import { CommandItem } from './items';
+
+export class OverviewItem {
+    constructor(protected label: string, protected command: Command) {}
+
+    getTreeItem(): TreeItem | Promise<TreeItem> {
+        let node = new TreeItem(this.label);
+        node.command = this.command;
+        node.description = this.command.tooltip;
+        
+        return node;
+    }
+}
 
 export class OverviewView implements TreeDataProvider<string> {
     protected tree?: TreeView<string>;
@@ -23,7 +34,7 @@ export class OverviewView implements TreeDataProvider<string> {
     ];
     protected itemsList: string[];
 
-    protected items: {[id: string]: (() => string) | CommandItem};
+    protected items: {[id: string]: (() => string) | OverviewItem};
 
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._onDidChangeTreeData = new EventEmitter());
@@ -62,17 +73,17 @@ export class OverviewView implements TreeDataProvider<string> {
             },
             'analyzers': () => 'Used analyzers: ' + ExtensionApi.aggregate.aggregateData!.analyzers.join(', '),
             'separator': () => '---',
-            'reloadMetadata': new CommandItem('Reload CodeChecker metadata', {
+            'reloadMetadata': new OverviewItem('Reload CodeChecker metadata', {
                 title: 'reloadMetadata', 
                 command: 'codechecker.processor.reloadMetadata',
                 arguments: []
             }),
-            'rebuildFile': new CommandItem('Re-analyze current file', {
+            'rebuildFile': new OverviewItem('Re-analyze current file', {
                 title: 'rebuildCurrentFile', 
                 command: 'workbench.action.tasks.runTask',
                 arguments: [{type: ExecutorApi.codeCheckerType, analyzeType: AnalyzeType.analyzeFile}]
             }),
-            'rebuildProject': new CommandItem('Re-analyze entire project', {
+            'rebuildProject': new OverviewItem('Re-analyze entire project', {
                 title: 'rebuildCurrentFile', 
                 command: 'workbench.action.tasks.runTask',
                 arguments: [{type: ExecutorApi.codeCheckerType, analyzeType: AnalyzeType.analyzeProject}]
@@ -114,7 +125,7 @@ export class OverviewView implements TreeDataProvider<string> {
 
     getTreeItem(item: string): TreeItem | Promise<TreeItem> {
         let displayedItem = this.items[item];
-        let node = displayedItem instanceof CommandItem
+        let node = displayedItem instanceof OverviewItem
             ? displayedItem.getTreeItem()
             : new TreeItem(displayedItem());
         

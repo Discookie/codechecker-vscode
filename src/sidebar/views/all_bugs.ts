@@ -53,8 +53,8 @@ export class AllBugsView implements TreeDataProvider<AllBugsMetadata> {
     }
 
     onConfigChanged(event: ConfigurationChangeEvent) {
-        if (event.affectsConfiguration('codechecker.editor')) {
-            this.currentSort = workspace.getConfiguration('codechecker.editor').get<string>('defaultSort') as SortType;
+        if (event.affectsConfiguration('codechecker.sidebar')) {
+            this.currentSort = workspace.getConfiguration('codechecker.sidebar').get<string>('defaultSort') as SortType;
         }
         this.refreshBugList();
     }

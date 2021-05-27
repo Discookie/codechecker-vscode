@@ -33,18 +33,19 @@ export class AllBugsView implements TreeDataProvider<AllBugsMetadata> {
         ctx.subscriptions.push(this._onDidChangeTreeData = new EventEmitter());
         ExtensionApi.aggregate.aggregateUpdated(this.onAggregateUpdated, this, ctx.subscriptions);
         workspace.onDidChangeConfiguration(this.onConfigChanged, this, ctx.subscriptions);
+        
+        ctx.subscriptions.push(this.tree = window.createTreeView(
+            'codechecker.views.allBugs',
+            {
+                treeDataProvider: this
+            }
+        ));
 
         this.init();
     }
 
     protected init() {
         this.currentSort = workspace.getConfiguration('codechecker.sidebar').get<string>('defaultSort') as SortType;
-        this.tree = window.createTreeView(
-            'codechecker.views.allBugs',
-            {
-                treeDataProvider: this
-            }
-        );
     }
 
     private _onDidChangeTreeData: EventEmitter<void>;

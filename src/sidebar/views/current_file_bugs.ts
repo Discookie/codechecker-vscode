@@ -18,19 +18,19 @@ export class CurrentFileView implements TreeDataProvider<CurrentFileMetadata> {
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._onDidChangeTreeData = new EventEmitter());
         ExtensionApi.diagnostics.diagnosticsUpdated(this.onDiagnosticsUpdated, this, ctx.subscriptions);
+        
+        ctx.subscriptions.push(this.tree = window.createTreeView(
+            'codechecker.views.currentFile',
+            {
+                treeDataProvider: this
+            }
+        ));
 
         this.init();
     }
 
     protected init() {
         this.currentFile = window.activeTextEditor?.document.uri;
-        
-        this.tree = window.createTreeView(
-            'codechecker.views.currentFile',
-            {
-                treeDataProvider: this
-            }
-        );
     }
 
     private _onDidChangeTreeData: EventEmitter<void>;

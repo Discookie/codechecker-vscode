@@ -40,8 +40,17 @@ export class OverviewView implements TreeDataProvider<string> {
         ctx.subscriptions.push(this._onDidChangeTreeData = new EventEmitter());
         ExtensionApi.aggregate.aggregateUpdated(this.updateStats, this, ctx.subscriptions);
 
-        this.items = {};
-        this.itemsList = [];
+        this.items = {
+            'loading': () => 'Loading overview, please wait...'
+        };
+        this.itemsList = ['loading'];
+
+        ctx.subscriptions.push(this.tree = window.createTreeView(
+            'codechecker.views.overview',
+            {
+                treeDataProvider: this
+            }
+        ));
 
         this.init();
     }
@@ -89,15 +98,6 @@ export class OverviewView implements TreeDataProvider<string> {
                 arguments: [{type: ExecutorApi.codeCheckerType, analyzeType: AnalyzeType.analyzeProject}]
             }),
         };
-        
-        this.itemsList = ['loading'];
-
-        this.tree = window.createTreeView(
-            'codechecker.views.overview',
-            {
-                treeDataProvider: this
-            }
-        );
     }
 
     updateStats(event?: AggregateData) {

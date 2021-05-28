@@ -10,11 +10,16 @@ export class ExecutorApi implements TaskProvider<Task> {
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._onBuildFinished = new EventEmitter());
         ctx.subscriptions.push(tasks.registerTaskProvider(ExecutorApi.codeCheckerType, this));
+        tasks.onDidEndTask(this.taskFinished, this, ctx.subscriptions);
     }
 
     private _onBuildFinished: EventEmitter<void>;
     public get onBuildFinished(): Event<void> {
         return this._onBuildFinished.event;
+    }
+
+    taskFinished() {
+        this._onBuildFinished.fire();
     }
 
     provideTasks(token: CancellationToken): ProviderResult<Task[]> {

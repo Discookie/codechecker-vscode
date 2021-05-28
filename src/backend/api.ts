@@ -4,10 +4,10 @@ import { ExecutorApi } from './runner';
 
 export class ExtensionApi {
     static init(ctx: ExtensionContext): void {
+        this._executor = new ExecutorApi(ctx);
         this._metadata = new MetadataApi(ctx);
         this._aggregate = new AggregateDataApi(ctx);
         this._diagnostics = new DiagnosticsApi(ctx);
-        this._executor = new ExecutorApi(ctx);
     }
 
     private static _metadata: MetadataApi;

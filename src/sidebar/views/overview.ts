@@ -73,8 +73,8 @@ export class OverviewView implements TreeDataProvider<string> {
 
                 if (hours > 0 || minutes > 0) {
                     return 'Last run\'s length: ' + 
-                        (hours > 0 ? (hours + ':' + minutes.toPrecision(2)) : minutes) +
-                        seconds.toPrecision(4) + ' s';
+                        (hours > 0 ? (hours + ':' + minutes.toPrecision(2)) : minutes) + ':' +
+                        seconds.toPrecision(2) + ' s';
                 } else {
                     return 'Last run\'s length: ' + 
                         seconds + '.' + ms + ' s';

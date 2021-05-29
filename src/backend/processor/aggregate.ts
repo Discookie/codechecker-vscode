@@ -6,7 +6,7 @@ import { ExtensionApi } from "../api";
 export class AggregateDataApi {
     constructor(ctx: ExtensionContext) {
         ctx.subscriptions.push(this._aggregateUpdated = new EventEmitter());
-        ExtensionApi.metadata.metadataUpdated(this.metadataUpdated, this, ctx.subscriptions);
+        ExtensionApi.metadata.metadataUpdated(this.onMetadataUpdated, this, ctx.subscriptions);
 
         this.init();
     }
@@ -97,7 +97,7 @@ export class AggregateDataApi {
         this._aggregateUpdated.fire(this._aggregateData);
     }
 
-    metadataUpdated(event: CheckerMetadata | undefined) {
+    onMetadataUpdated(event: CheckerMetadata | undefined) {
         this.reloadAggregateData()
             .catch((err) => {
                 console.error(err);

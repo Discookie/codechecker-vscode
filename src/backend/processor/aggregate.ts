@@ -77,6 +77,13 @@ export class AggregateDataApi {
             window.showErrorMessage('Failed to read CodeChecker aggregate data\nCheck console for details');
         }
 
+        // Avoid race condition
+        if (ExtensionApi.metadata.metadata === undefined) {
+            this._aggregateData = undefined;
+            this._aggregateUpdated.fire(this._aggregateData);
+            return;
+        }
+
         const localMeta = ExtensionApi.metadata.metadata;
         const analyzers = Object.keys(localMeta.analyzers)
             .filter(key => localMeta.analyzers.hasOwnProperty(key));

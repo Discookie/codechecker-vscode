@@ -43,6 +43,10 @@
       {
         "command": "codechecker.editor.previousStep",
         "title": "CodeChecker: Previous reproduction step"
+      },
+      {
+        "command": "codechecker.processor.reloadMetadata",
+        "title": "CodeChecker: Reload metadata"
       }
     ],
     "configuration": {
@@ -58,10 +62,10 @@
           "description": "Output for CodeChecker's analysis files",
           "default": "${workspaceFolder}/codechecker"
         },
-        "codechecker.editor.showBugs": {
-          "type": "boolean",
-          "description": "Toggles showing bugs inside the editor.",
-          "default": "true"
+        "codechecker.runner.executableArguments": {
+          "type": "string",
+          "description": "Arguments to the CodeChecker executable",
+          "default": ""
         },
         "codechecker.sidebar.defaultSort": {
           "type": "string",

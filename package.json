@@ -1,5 +1,6 @@
 {
-  "name": "codechecker-vscode",
+  "name": "codechecker",
+  "publisher": "discookie",
   "displayName": "CodeChecker for VSCode",
   "description": "CodeChecker integration for Visual Studio Code",
   "version": "0.0.1",

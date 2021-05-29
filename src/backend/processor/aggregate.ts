@@ -39,6 +39,7 @@ export class AggregateDataApi {
         let errorFlag = false;
 
         for (const [sourceFile, plistFiles] of ExtensionApi.metadata.sourceFiles.entries()) {
+            let offset = 0;
             for (const plistFile of plistFiles) {
                 try {
                     const diagnosticFile = await parseDiagnostics(plistFile);
@@ -52,7 +53,7 @@ export class AggregateDataApi {
                                 // eslint-disable-next-line @typescript-eslint/naming-convention
                                 source_file: sourceFile,
                                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                                source_idx: idx
+                                source_idx: offset + idx
                             },
                             category: diagnostic.category,
                             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -63,6 +64,8 @@ export class AggregateDataApi {
 
                         entries.push(aggregateEntry);
                     }
+
+                    offset += diagnosticFile.diagnostics.length;
                 } catch (err) {
                     console.error(err);
                     errorFlag = true;

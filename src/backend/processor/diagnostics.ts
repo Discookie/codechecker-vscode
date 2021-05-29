@@ -123,6 +123,7 @@ export class DiagnosticsApi {
         }
 
         this._diagnosticSourceFiles = TrieMap.from(plistFileReferences);
+        this._activeReprPath = undefined;
 
         this._diagnosticsUpdated.fire();
     }
@@ -173,6 +174,7 @@ export class DiagnosticsApi {
             return;
         }
 
+        // fires reloadDiagnostics
         this.stickyFile = undefined;
     }
 

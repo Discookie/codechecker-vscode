@@ -21,7 +21,7 @@ export class AllBugsView implements TreeDataProvider<AllBugsMetadata> {
     protected currentSort = SortType.filename;
     protected keyFunctions = {
         filename: (entry: AggregateEntry) => entry.location.file,
-        reprPath: (entry: AggregateEntry) => entry.path_length.toString(),
+        reprPath: (entry: AggregateEntry) => entry.path_length.toString().padStart(4),
         analyzer: (entry: AggregateEntry) => entry.analyzer_name,
     };
 

@@ -3,7 +3,8 @@
   "publisher": "discookie",
   "displayName": "CodeChecker for VSCode",
   "description": "CodeChecker integration for Visual Studio Code",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.55.0"
   },

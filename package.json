@@ -17,10 +17,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "codechecker-vscode.helloWorld",
-        "title": "CodeChecker: Hello World"
-      },
-      {
         "command": "codechecker.editor.toggleAllBugs",
         "title": "CodeChecker: Show/Hide all bugs by default"
       },

@@ -17,10 +17,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "codechecker.editor.toggleAllBugs",
-        "title": "CodeChecker: Show/Hide all bugs by default"
-      },
-      {
         "command": "codechecker.editor.toggleSteps",
         "title": "CodeChecker: Show/Hide reproduction steps"
       },

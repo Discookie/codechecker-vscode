@@ -3,7 +3,7 @@
   "publisher": "discookie",
   "displayName": "CodeChecker for VSCode",
   "description": "CodeChecker integration for Visual Studio Code",
-  "version": "1.0.0",
+  "version": "0.99.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.55.0"
@@ -64,7 +64,11 @@
           "type": "string",
           "description": "Sets the default sort for the 'All files' section.",
           "default": "filename",
-          "enum": ["filename", "reprPath", "analyzer"]
+          "enum": [
+            "filename",
+            "reprPath",
+            "analyzer"
+          ]
         }
       }
     },
@@ -92,7 +96,10 @@
           "analyzeType": {
             "type": "string",
             "description": "Type of analysis to execute.",
-            "enum": ["analyzeProject", "analyzeFile"]
+            "enum": [
+              "analyzeProject",
+              "analyzeFile"
+            ]
           }
         }
       }

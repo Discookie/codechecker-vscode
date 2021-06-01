@@ -1,8 +1,20 @@
 {
   "name": "codechecker",
   "publisher": "discookie",
+  "author": {
+    "name": "Discookie"
+  },
   "displayName": "CodeChecker for VSCode",
   "description": "CodeChecker integration for Visual Studio Code",
+  "icon": "media/codechecker_logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/discookie/codechecker-vscode.git"
+  },
+  "homepage": "https://github.com/discookie/codechecker-vscode/tree/master/README.md",
+  "bugs": {
+    "url": "https://github.com/discookie/codechecker-vscode/issues"
+  },
   "version": "0.99.0",
   "license": "MIT",
   "engines": {

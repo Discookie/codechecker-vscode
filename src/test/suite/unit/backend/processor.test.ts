@@ -110,7 +110,7 @@ suite('Unit: Diagnostic API', () => {
         
         await diagnosticsApi.reloadDiagnostics();
         assert.ok(diagnosticsApi.stickyFile === undefined, 'sticky file not cleared via repr path');
-        assert.ok(diagnosticsApi.activeReprPath === undefined, 'repr path not cleared');
+        assert.ok(diagnosticsApi.activeReprPath !== undefined, 'repr path cleared on reload');
     }).timeout(5000);
 
     test('updates on workspace change', async () => {

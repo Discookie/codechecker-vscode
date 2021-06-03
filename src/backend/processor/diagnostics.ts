@@ -123,7 +123,12 @@ export class DiagnosticsApi {
         }
 
         this._diagnosticSourceFiles = TrieMap.from(plistFileReferences);
-        this._activeReprPath = undefined;
+
+        if (this._activeReprPath) {
+            const [reprFile, reprIdx] = this._activeReprPath;
+            this._activeReprPath = undefined;
+            this.setActiveReprPath(reprFile, reprIdx);
+        }
 
         this._diagnosticsUpdated.fire();
     }

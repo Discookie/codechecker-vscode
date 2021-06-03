@@ -15,7 +15,7 @@
   "bugs": {
     "url": "https://github.com/discookie/codechecker-vscode/issues"
   },
-  "version": "0.99.0",
+  "version": "0.99.1",
   "license": "MIT",
   "engines": {
     "vscode": "^1.55.0"
